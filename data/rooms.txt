@@ -1,0 +1,14 @@
+$0,0
+This is a shop. Here you can buy all kind of items you need.
+You are in a rusty shop, packed with all kind of things to buy. The shopkeeper looks impatient.
+["shop"]
+south
+0
+$1,0
+You are in the road that leads to the desert.
+"You would feel really, really lonely in this road, were not for the" + " cactus".green + " that seems to look at you quite intensively."
+["use"]
+north
+2
+cactus_description ["This is a Prickly Pear cactus type, known for its juicy fruits.", "This is a Prickly Pear cactus type, known for its juicy fruits. It has no fruit now."]
+cactus_use ["knife", "You use your knife to cut the fruit out without pinching yourself", "You poke yourself with the cactus spines."]
