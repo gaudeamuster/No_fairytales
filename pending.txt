@@ -1,6 +1,5 @@
 Pending:
 
-- save file (to correct text malposition)
 - Pre-story (before the character creation)
 - help command (update with all commands)
 - examine command (make it more than an empty function)

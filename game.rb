@@ -119,6 +119,7 @@ save_files = list_saved_files()
 else
   puts "Please find below the list of saved games."
   puts "Write a number from the list or write a new saved file name.\n"
+  display_files(save_files)
   savefile_name = gets.chomp()
   if savefile_name.count("0-9") > 0 and savefile_name.to_i <= save_files.length
 	savefile_name = save_files[(savefile_name.to_i)-1]
@@ -137,11 +138,18 @@ save_files = []
 Find.find("save") do |path|
   save_files << path if path =~ /.*\.sav$/
 end
+
+return save_files
+end
+
+def display_files(save_files)
+
 save_files.each_with_index do |file, index|
   puts "#{index + 1}.\t#{file.sub(/^save\//, '')}"
 end
 
 return save_files
+
 end
 
 def write_savefile(filename) # Writes the game information into a saved file.
@@ -160,7 +168,6 @@ room_file.each_with_index do |line, index|
   if line.include?("$") and line.chomp() == "$#{$room_data[0][0]},#{$room_data[0][1]}"
       for number in 1..4
 	    $room_data[number] = room_file[(index+number)]
-		puts $room_data[number]
 	  end
 	  for number in 6..6+room_file[(index+5)].to_i
 	    $room_data[number] = room_file[(index+number)]
@@ -204,6 +211,7 @@ def load_game()
 
 puts "Choose a file to load."
 file_list = list_saved_files()
+display_files(file_list)
 filename = gets.chomp()
 if filename.count("0-9") > 0 and filename.to_i <= file_list.length
   filename = file_list[(filename.to_i)-1].sub(/^save\//, '')
