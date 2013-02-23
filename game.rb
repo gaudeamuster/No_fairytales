@@ -3,10 +3,14 @@ require 'win32console'
 require 'io/console'
 
 
-def create_character() # Creates the character with its details.
+def new_game() # Creates the character with its details.
 puts "Welcome to the game! Please select a name:"
 print "> "
-name = gets.chomp()
+$character["name"] = gets.chomp()
+$character["items"] = []
+$character["money"] = 200
+$available_commands = ["help", "shop", "travel", "exit", "list", "save", "menu"]
+$room_data[0] = [0,0]
 end
 
 def prompt() # The game command prompt
@@ -87,6 +91,7 @@ else
     when "exit" then exit()
     when "list" then list()
 	when "look" then look()
+	when "menu" then menu()
 	when command.include?("examine") then
 	  command = command.sub(/^examine /, '')
 	  examine(command)
@@ -101,7 +106,6 @@ end
 
 def save_game() # Saves the game into a file.
 save_files = list_saved_files()
-
  if save_files.length == 0 then
   puts "There are no saved files. Do you want to create one? yes/no\n"
   savefile_name = gets.chomp()
@@ -115,12 +119,9 @@ save_files = list_saved_files()
 else
   puts "Please find below the list of saved games."
   puts "Write a number from the list or write a new saved file name.\n"
-  save_files = list_saved_files()
-  file_counter = display_saved_files(save_files)
   savefile_name = gets.chomp()
-  if savefile_name.count("0-9") > 0 and savefile_name.to_i <= file_counter
-	savefile_name = savefile_name.to_i - 1
-	savefile_name = save_files[savefile_name]
+  if savefile_name.count("0-9") > 0 and savefile_name.to_i <= save_files.length
+	savefile_name = save_files[(savefile_name.to_i)-1]
   else
   savefile_name = "save/" + savefile_name + ".sav"
   end
@@ -129,37 +130,26 @@ end
 
 end
 
-def list_saved_files() # Searchs and stores the list of saved files
+def list_saved_files() # Searchs and displays the list of saved files
 require 'find'
 Dir.chdir(File.dirname(__FILE__))
 save_files = []
 Find.find("save") do |path|
   save_files << path if path =~ /.*\.sav$/
 end
-return save_files
+save_files.each_with_index do |file, index|
+  puts "#{index + 1}.\t#{file.sub(/^save\//, '')}"
 end
 
-def display_saved_files(save_files) # Shows the list of saved files
-  file_counter = 0
-  
-  while file_counter < save_files.length
-    save_files[file_counter]= save_files[file_counter].sub(/^save\//, '')
-    puts "#{file_counter + 1}.\t#{save_files[file_counter]}".yellow
-    file_counter = file_counter + 1
-  end
-  
-return file_counter
+return save_files
 end
 
 def write_savefile(filename) # Writes the game information into a saved file.
 saved_file = File.open(filename, 'w')
-saved_file.write("#{$character_name}\n")
-
-for item in $character_items
-  saved_file.write("#{item}, ")
+$character.each do |key, value|
+  saved_file.write("#{value}\n")
 end
-saved_file.write("\n")
-saved_file.write("#{$room_number}")
+  saved_file.write("#{$room_data[0][0]},#{$room_data[0][1]}")
 saved_file.close()
 end
 
@@ -184,14 +174,58 @@ puts $room_data[1]
 
 end
 
+def menu()
 
-$character_name = create_character()
-$available_commands = ["help", "shop", "travel", "exit", "list", "save"]
-$character_items = []
-$character_money = 100
+puts "Choose an option from the menu:\n\n"
+puts "1.\tNew game".green
+puts "2.\tSave game".green
+puts "3.\tLoad game".green
+puts "4.\tExit game".green
+puts "5.\tReturn to game".green
+case option = gets.chomp()
+  when "1" then
+  new_game()
+  menu()
+  when "2" then
+  save_game()
+  menu()
+  when "3" then
+  load_game()
+  menu()
+  when "4" then exit()
+  when "5" then return
+else
+  menu()
+end
+
+end
+
+def load_game()
+
+puts "Choose a file to load."
+file_list = list_saved_files()
+filename = gets.chomp()
+if filename.count("0-9") > 0 and filename.to_i <= file_list.length
+  filename = file_list[(filename.to_i)-1].sub(/^save\//, '')
+elsif filename == "cancel"
+  return
+else
+  puts "Choose a number from the list, or write \"cancel\" to return."
+end
+room_file = IO.readlines("save/" + filename)
+$character["name"] = room_file[0]
+$character["items"] = room_file[1]
+$character["money"] = room_file[2].to_i
+$room_data[0] = room_file[3].split(',')
+$room_data[0][0] = $room_data[0][0].to_i
+$room_data[0][1] = $room_data[0][1].to_i
+
+end
+
 $room_data = []
-initial_position = [0,0]
-$room_data[0] = initial_position
+$room_data[0] = []
+$character = Hash.new()
+menu()
 read_room()
 
 puts "\nType a command. Type \"list\" for a list of commands, or \"help command\" for information about a specific one."

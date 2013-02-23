@@ -1,14 +1,13 @@
 Pending:
 
-- load game
-- save file (to match load game)
+- save file (to correct text malposition)
 - Pre-story (before the character creation)
-- create_character function (put all character creation items inside)
 - help command (update with all commands)
 - examine command (make it more than an empty function)
 - actions function (make it complete with all commands)
 - read_room function (make it work for all elements)
-- rooms.txt file (populate)
+- rooms.txt file (populate AND change format)
 - story.txt file (create and populate)
 - use function (create and make it work)
 - text color (make .color work with text grabbed from a text file)
+- redo rooms variable and all functions that use it to be a hash instead of an array
